@@ -1,1 +1,10 @@
 
+argparse
+getpass
+os
+pathlib
+smtplib
+platform
+cyptography
+email
+dotenv
