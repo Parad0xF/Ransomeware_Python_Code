@@ -1,4 +1,4 @@
-Ransomware has been one of the big lucrative businesses for cybercriminals in the past decade. I am passionate about cybersecurity, and my approach constantly involves discovering things myself. So in, one day, during one penetration testing, I decided to assemble a ransomware executable on my own. In the following article, I will show how easy to build ransomware using Python.
+The past decade has seen ransomware emerge as a highly profitable endeavor for cybercriminals. As an individual with a strong interest in cybersecurity, I have taken an active approach to learning by experimenting and discovering new information on my own. One such instance occurred during a penetration testing session, where I decided to develop my own ransomware executable using Python. In this article, I will demonstrate how straightforward it is to create a ransomware program utilizing Python programming language.
 
 Project Dependencies
 
